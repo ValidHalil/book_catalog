@@ -1,10 +1,9 @@
-// Global variables
+
 let currentUser = localStorage.getItem('currentUser') || null;
 let token = localStorage.getItem('token') || null;
-let authors = []; // Store authors for book creation
-let allBooks = []; // Store all books globally
+let authors = []; 
+let allBooks = []; 
 
-// DOM Elements
 const contentDiv = document.getElementById('content');
 const loginBtn = document.getElementById('login-btn');
 const registerBtn = document.getElementById('register-btn');
@@ -13,7 +12,6 @@ const authorsLink = document.getElementById('authors-link');
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 
-// Place User Management button in the main nav bar
 const navBar = document.querySelector('.navbar-nav');
 let userManagementBtn = document.getElementById('user-management-link');
 if (!userManagementBtn) {
@@ -26,17 +24,15 @@ if (!userManagementBtn) {
 }
 userManagementBtn.style.display = 'none';
 
-// Make Book Catalog logo inactive
 const logo = document.querySelector('.navbar-brand');
 if (logo) {
     logo.style.pointerEvents = 'none';
     logo.style.cursor = 'default';
 }
 
-// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     loadBooks();
-    loadAuthorsList(); // Load authors for book creation form
+    loadAuthorsList(); 
     updateUI();
 });
 
@@ -262,28 +258,22 @@ function showBookDetails(book, currentUser) {
         </div>
     `;
 
-    // Remove existing modal if any
     const existingModal = document.getElementById('bookDetailsModal');
     if (existingModal) {
         existingModal.remove();
     }
 
-    // Add new modal to the body
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
     modal.show();
 
-    // Add event listeners for author links
     document.querySelectorAll('.author-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const authorId = link.dataset.id;
             modal.hide();
-            // Switch to authors tab
             document.getElementById('authors-link').click();
-            // Find and show the author details
             const author = authors.find(a => a.id === parseInt(authorId));
             if (author) {
                 showAuthorDetails(author);
@@ -291,7 +281,6 @@ function showBookDetails(book, currentUser) {
         });
     });
 
-    // Add event listeners for buttons
     document.getElementById('editBookBtn')?.addEventListener('click', () => {
         modal.hide();
         showEditBookForm(book);
@@ -302,11 +291,8 @@ function showBookDetails(book, currentUser) {
     });
 
     document.querySelector('#bookDetailsModal .rate-book')?.addEventListener('click', () => {
-        // Hide the book details modal first
         const bookDetailsModal = bootstrap.Modal.getInstance(document.getElementById('bookDetailsModal'));
         if (bookDetailsModal) bookDetailsModal.hide();
-
-        // Open the star-based modal for this book
         currentRateBookId = book.id;
         const userRating = book.user_ratings?.find(r => r.user_id === currentUser?.id);
         const currentRating = userRating ? userRating.rating : '';
@@ -357,35 +343,29 @@ function showAuthorDetails(author) {
         </div>
     `;
 
-    // Remove existing modal if any
     const existingModal = document.getElementById('authorDetailsModal');
     if (existingModal) {
         existingModal.remove();
     }
 
-    // Add new modal to the body
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-    // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('authorDetailsModal'));
     modal.show();
 
-    // Add event listeners for book links
     document.querySelectorAll('.book-link').forEach(link => {
         link.addEventListener('click', () => {
             const bookId = link.dataset.id;
             modal.hide();
             loadBooks(() => {
-                // Find and show the book details after books are loaded
                 const book = allBooks.find(b => b.id === parseInt(bookId));
                 if (book) {
                     showBookDetails(book, currentUser);
                 }
-            }); // setActive defaults to true, so Books tab will be active
+            }); 
         });
     });
 
-    // Add event listener for edit button
     document.getElementById('editAuthorBtn')?.addEventListener('click', () => {
         modal.hide();
         showEditAuthorForm(author);
@@ -533,14 +513,13 @@ function showEditBookForm(book) {
     });
 }
 
-// Remove or disable the showEditBookForm function
 document.querySelectorAll('.edit-book')?.forEach(btn => btn.remove());
 
 async function loadBooks(callback, setActive = true) {
     try {
         const response = await fetch('/books/');
         allBooks = await response.json();
-        console.log('Loaded books:', allBooks);  // Debug log
+        console.log('Loaded books:', allBooks);  
         
         let html = `
             <div class="row mb-4">
@@ -588,13 +567,13 @@ async function loadBooks(callback, setActive = true) {
             searchTimeout = setTimeout(async () => {
                 if (query.length >= 1) {
                     try {
-                        console.log('Fetching search results for:', query);  // Debug log
+                        console.log('Fetching search results for:', query);  
                         const response = await fetch(`/books/search/${encodeURIComponent(query)}`);
                         if (!response.ok) {
                             throw new Error('Search failed');
                         }
                         const results = await response.json();
-                        console.log('Search results:', results);  // Debug log
+                        console.log('Search results:', results);  
                         
                         const booksContainer = document.getElementById('books-container');
                         if (results.length > 0) {
@@ -775,7 +754,7 @@ async function loadAuthors() {
                             throw new Error('Search failed');
                         }
                         const results = await response.json();
-                        console.log('Search results:', results);  // Debug log
+                        console.log('Search results:', results);  
                         
                         const authorsContainer = document.getElementById('authors-container');
                         if (results.length > 0) {
@@ -1141,7 +1120,6 @@ function setActiveNav(activeBtn) {
     if (activeBtn) activeBtn.classList.add('active');
 }
 
-// Add Bootstrap Toast container if not present
 if (!document.getElementById('toast-container')) {
     const toastDiv = document.createElement('div');
     toastDiv.id = 'toast-container';
