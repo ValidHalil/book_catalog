@@ -37,7 +37,6 @@ def read_authors(
     db: Session = Depends(get_db)
 ):
     authors = db.query(Author).offset(skip).limit(limit).all()
-    # Eagerly load books for each author
     for author in authors:
         _ = author.books
     return authors
@@ -79,12 +78,11 @@ def delete_author(
     if db_author is None:
         raise HTTPException(status_code=404, detail="Author not found")
 
-    # Remove the author from all books, and delete books with no authors left
     books = db_author.books[:]
     deleted_books = []
     for book in books:
         db_author.books.remove(book)
-        db.commit()  # Commit to update the relationship
+        db.commit() 
         db.refresh(book)
         if len(book.authors) == 0:
             deleted_books.append(book.title)
@@ -97,9 +95,9 @@ def delete_author(
 @router.get("/search/{query}", response_model=List[AuthorSchema])
 def search_authors(query: str, db: Session = Depends(get_db)):
     query = query.lower()
-    print(f"Searching for authors: {query}")  # Debug log
+    print(f"Searching for authors: {query}")  
     authors = db.query(Author).filter(
         Author.name.ilike(f"%{query}%")
     ).all()
-    print(f"Found {len(authors)} authors")  # Debug log
+    print(f"Found {len(authors)} authors")  
     return authors 
